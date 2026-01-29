@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🔥</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div id="app">
+    <!-- Login -->
+    <div id="loginForm" class="screen hidden">
+      <div class="center">
+        <div class="icon-large">🔥</div>
+        <form id="login">
+          <input type="email" id="email" placeholder="📧 Email" required>
+          <input type="password" id="password" placeholder="🔒 Password" required>
+          <button type="submit" class="btn">➡️</button>
+        </form>
+        <div class="hint">⚡ test@example.com</div>
+        <div id="loginError" class="error hidden"></div>
+      </div>
+    </div>
+
+    <!-- Dashboard -->
+    <div id="dashboard" class="screen hidden">
+      <div class="top">
+        <div class="title-row">
+          <span class="icon">🔥</span>
+          <span id="syncStatus">⏱️</span>
+          <button id="logoutBtn" class="icon-btn">⚙️</button>
+        </div>
+      </div>
+      
+      <div class="rules" id="rulesList">
+        <div class="empty">📝</div>
+      </div>
+      
+      <div class="bottom">
+        <button id="syncBtn" class="icon-btn">🔄</button>
+        <button id="dashboardBtn" class="icon-btn">⚡</button>
+      </div>
+    </div>
+
+    <!-- Loading -->
+    <div id="loading" class="screen">
+      <div class="center">
+        <div class="pulse">🔥</div>
+      </div>
+    </div>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>

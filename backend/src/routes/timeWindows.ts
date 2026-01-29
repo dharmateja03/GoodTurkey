@@ -1,0 +1,81 @@
+import { Router } from "express";
+import { db } from "../db/index";
+import { timeWindows, blockedSites } from "../db/schema";
+import { eq, and } from "drizzle-orm";
+import { AuthRequest, authMiddleware } from "../middleware/auth";
+
+const router = Router();
+
+router.use(authMiddleware);
+
+router.post("/", async (req: AuthRequest, res): Promise<void> => {
+  try {
+    const { blockedSiteId, dayOfWeek, startTime, endTime } = req.body;
+
+    if (!blockedSiteId || !startTime || !endTime) {
+      res.status(400).json({ error: "blockedSiteId, startTime, and endTime required" });
+      return;
+    }
+
+    const site = await db.query.blockedSites.findFirst({
+      where: and(
+        eq(blockedSites.id, blockedSiteId),
+        eq(blockedSites.userId, req.userId!)
+      ),
+    });
+
+    if (!site) {
+      res.status(404).json({ error: "Blocked site not found" });
+      return;
+    }
+
+    const [newWindow] = await db
+      .insert(timeWindows)
+      .values({
+        blockedSiteId,
+        dayOfWeek: dayOfWeek ?? null,
+        startTime,
+        endTime,
+      })
+      .returning();
+
+    res.status(201).json(newWindow);
+  } catch (error) {
+    console.error("Create time window error:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+router.delete("/:id", async (req: AuthRequest, res): Promise<void> => {
+  try {
+    const { id } = req.params;
+
+    const window = await db.query.timeWindows.findFirst({
+      where: eq(timeWindows.id, id),
+      with: {
+        blockedSite: {
+          columns: { userId: true },
+        },
+      },
+    });
+
+    if (!window) {
+      res.status(404).json({ error: "Time window not found" });
+      return;
+    }
+
+    if (window.blockedSite.userId !== req.userId!) {
+      res.status(403).json({ error: "Unauthorized" });
+      return;
+    }
+
+    await db.delete(timeWindows).where(eq(timeWindows.id, id));
+
+    res.json({ success: true });
+  } catch (error) {
+    console.error("Delete time window error:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+export default router;

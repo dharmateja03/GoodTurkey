@@ -1,0 +1,94 @@
+# IDE/Tool configs
+.agents/
+.claude/
+.cursor/
+.opencode/
+.windsurf/
+
+# Dependencies
+node_modules/
+.pnp/
+.pnp.js
+
+# Build outputs
+dist/
+build/
+.next/
+out/
+
+# Environment files
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+*.env
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Runtime data
+pids/
+*.pid
+*.seed
+*.pid.lock
+
+# Coverage
+coverage/
+*.lcov
+.nyc_output/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+.project
+.classpath
+.c9/
+*.launch
+.settings/
+
+# OS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# TypeScript
+*.tsbuildinfo
+
+# Testing
+.jest/
+
+# Misc
+*.pem
+*.local
+.cache/
+.parcel-cache/
+.turbo/
+
+# Database
+*.sqlite
+*.sqlite3
+*.db
+
+# Extension builds
+extension/dist/
+extension/*.zip
+*.crx
+*.xpi
+
+# Temporary files
+tmp/
+temp/
+*.tmp
