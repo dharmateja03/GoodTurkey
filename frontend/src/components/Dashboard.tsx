@@ -62,7 +62,7 @@ export function Dashboard() {
 
   const activeSites = sites.filter(s => s.isActive).length;
   const totalSites = sites.length;
-  const sitesWithWindows = sites.filter(s => s.timeWindows && s.timeWindows.length > 0).length;
+  const totalBlocked = sites.reduce((sum, s) => sum + (s.accessAttempts || 0), 0);
 
   if (loading) {
     return (
@@ -116,8 +116,8 @@ export function Dashboard() {
               <div className="stat-label">Active</div>
             </div>
             <div className="stat-card">
-              <div className="stat-value" style={{ background: 'linear-gradient(135deg, var(--accent-primary) 0%, #ff8844 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>{sitesWithWindows}</div>
-              <div className="stat-label">Windows</div>
+              <div className="stat-value" style={{ background: 'linear-gradient(135deg, var(--accent-danger) 0%, #ff6644 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>{totalBlocked}</div>
+              <div className="stat-label">Blocked</div>
             </div>
           </div>
 

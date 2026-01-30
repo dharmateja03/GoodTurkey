@@ -40,6 +40,7 @@ export const blockedSites = pgTable(
     url: varchar("url", { length: 500 }).notNull(),
     isActive: boolean("is_active").default(true),
     unlockRequestedAt: timestamp("unlock_requested_at"), // When user requested to delete/deactivate (6-hour delay)
+    accessAttempts: integer("access_attempts").default(0), // How many times user tried to access this site
     createdAt: timestamp("created_at").defaultNow(),
   }
 );

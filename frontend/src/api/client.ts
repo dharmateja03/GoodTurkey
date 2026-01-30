@@ -19,6 +19,7 @@ export interface BlockedSite {
   unlockRequestedAt: string | null;
   unlockReady: boolean;
   timeRemaining: number | null; // milliseconds remaining
+  accessAttempts: number; // how many times user tried to access
 }
 
 export interface Category {

@@ -195,6 +195,19 @@ export function SiteList({ sites, onSiteDeleted, onSiteUpdated, onSiteSelect, se
                   <div className="flex items-center gap-3">
                     <div className={`status-dot ${site.isActive ? 'status-active' : 'status-inactive'}`} />
                     <span className="site-card-url truncate">{site.url}</span>
+                    {site.accessAttempts > 0 && (
+                      <span
+                        className="flex items-center gap-1 px-2 py-0.5 rounded text-xs font-mono"
+                        style={{ background: 'var(--accent-danger-soft)', color: 'var(--accent-danger)' }}
+                        title={`Blocked ${site.accessAttempts} access attempt${site.accessAttempts !== 1 ? 's' : ''}`}
+                      >
+                        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                          <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                          <circle cx="12" cy="12" r="3"/>
+                        </svg>
+                        {site.accessAttempts}
+                      </span>
+                    )}
                   </div>
 
                   {/* Time Windows */}

@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { db } from "../db/index";
 import { blockedSites, timeWindows } from "../db/schema";
-import { eq, and } from "drizzle-orm";
+import { eq, and, like, sql } from "drizzle-orm";
 import { AuthRequest, authMiddleware } from "../middleware/auth";
 import type { BlockedSite, TimeWindow } from "../db/schema";
 
@@ -215,6 +215,72 @@ router.post("/:id/cancel-unlock", async (req: AuthRequest, res): Promise<void> =
     res.json(updated);
   } catch (error) {
     console.error("Cancel unlock error:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+// Increment access attempts by URL (called by extension when user tries to access blocked site)
+router.post("/attempt", async (req: AuthRequest, res): Promise<void> => {
+  try {
+    const { url } = req.body;
+
+    if (!url) {
+      res.status(400).json({ error: "URL required" });
+      return;
+    }
+
+    // Find the site by URL pattern match
+    const sites = await db
+      .select()
+      .from(blockedSites)
+      .where(eq(blockedSites.userId, req.userId!));
+
+    const matchingSite = sites.find(site => url.includes(site.url));
+
+    if (!matchingSite) {
+      res.status(404).json({ error: "Site not found" });
+      return;
+    }
+
+    const [updated] = await db
+      .update(blockedSites)
+      .set({ accessAttempts: (matchingSite.accessAttempts || 0) + 1 })
+      .where(eq(blockedSites.id, matchingSite.id))
+      .returning();
+
+    res.json({ accessAttempts: updated.accessAttempts, siteId: updated.id });
+  } catch (error) {
+    console.error("Record attempt error:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+// Increment access attempts by ID (called by extension when user tries to access blocked site)
+router.post("/:id/attempt", async (req: AuthRequest, res): Promise<void> => {
+  try {
+    const { id } = req.params;
+
+    const site = await db.query.blockedSites.findFirst({
+      where: and(
+        eq(blockedSites.id, id),
+        eq(blockedSites.userId, req.userId!)
+      ),
+    });
+
+    if (!site) {
+      res.status(404).json({ error: "Site not found" });
+      return;
+    }
+
+    const [updated] = await db
+      .update(blockedSites)
+      .set({ accessAttempts: (site.accessAttempts || 0) + 1 })
+      .where(eq(blockedSites.id, id))
+      .returning();
+
+    res.json({ accessAttempts: updated.accessAttempts });
+  } catch (error) {
+    console.error("Record attempt error:", error);
     res.status(500).json({ error: "Internal server error" });
   }
 });
