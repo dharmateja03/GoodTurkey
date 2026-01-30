@@ -1,4 +1,5 @@
-const API_BASE = 'http://localhost:3000/api';
+// Change this to your deployed backend URL
+const API_BASE = 'https://your-backend.railway.app/api'; // TODO: Update after deployment
 
 // DOM elements
 const loginForm = document.getElementById('loginForm');
@@ -65,7 +66,7 @@ function showDashboard() {
   });
 
   dashboardBtn.addEventListener('click', () => {
-    chrome.tabs.create({ url: 'http://localhost:5173' });
+    chrome.tabs.create({ url: 'https://your-frontend.vercel.app' }); // TODO: Update after deployment
   });
 
   logoutBtn.addEventListener('click', handleLogout);
@@ -120,7 +121,7 @@ async function handleLogin(e) {
 
 // Handle logout
 function handleLogout() {
-  if (confirm('Logout from HotTurkey?')) {
+  if (confirm('Logout from GoodTurkey?')) {
     chrome.runtime.sendMessage({ action: 'logout' }, () => {
       currentToken = null;
       currentUserId = null;

@@ -1,4 +1,5 @@
-const API_BASE = 'http://localhost:3000/api';
+// Change this to your deployed backend URL
+const API_BASE = 'https://your-backend.railway.app/api'; // TODO: Update after deployment
 const SYNC_INTERVAL_MINUTES = 15;
 
 // State
@@ -180,10 +181,31 @@ function isInAllowedTimeWindow(timeWindows) {
   return false; // Not in any allowed window
 }
 
+// Record access attempt to backend
+async function recordAccessAttempt(url) {
+  if (!token) return;
+
+  try {
+    await fetch(`${API_BASE}/sites/attempt`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ url }),
+    });
+  } catch (error) {
+    console.error('Failed to record access attempt:', error);
+  }
+}
+
 // Block navigation to blocked sites
 chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
   if (changeInfo.status === 'loading' && tab.url) {
     if (isUrlBlocked(tab.url)) {
+      // Record the attempt
+      recordAccessAttempt(tab.url);
+
       // Redirect to blocked page
       const blockedUrl = chrome.runtime.getURL('blocked.html') + '?url=' + encodeURIComponent(tab.url);
       chrome.tabs.update(tabId, { url: blockedUrl });

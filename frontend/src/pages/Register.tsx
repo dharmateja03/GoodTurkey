@@ -29,7 +29,7 @@ export function Register() {
     try {
       const response = await register(email, password);
       setToken(response.token);
-      navigate('/');
+      navigate('/dashboard');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Registration failed');
     } finally {

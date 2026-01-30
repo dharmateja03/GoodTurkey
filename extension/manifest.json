@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
-  "name": "HotTurkey",
+  "name": "GoodTurkey",
   "version": "1.0.0",
-  "description": "Lightweight website blocker with time windows",
+  "description": "Website blocker with 6-hour unlock delay",
   "permissions": [
     "storage",
     "alarms",
@@ -17,7 +17,7 @@
   },
   "action": {
     "default_popup": "popup/popup.html",
-    "default_title": "HotTurkey"
+    "default_title": "GoodTurkey"
   },
   "icons": {
     "16": "images/icon-16.png",

@@ -17,7 +17,7 @@ export function Login() {
     try {
       const response = await login(email, password);
       setToken(response.token);
-      navigate('/');
+      navigate('/dashboard');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Login failed');
     } finally {
