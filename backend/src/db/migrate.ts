@@ -10,7 +10,7 @@ if (!connectionString) {
 }
 
 async function runMigrations() {
-  const client = postgres(connectionString, { ssl: 'require' });
+  const client = postgres(connectionString as string, { ssl: 'require' });
 
   console.log("Running migrations...");
   try {

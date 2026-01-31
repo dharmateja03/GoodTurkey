@@ -50,13 +50,9 @@ router.delete("/:id", async (req: AuthRequest, res): Promise<void> => {
   try {
     const { id } = req.params;
 
+    // Find the time window
     const window = await db.query.timeWindows.findFirst({
       where: eq(timeWindows.id, id),
-      with: {
-        blockedSite: {
-          columns: { userId: true },
-        },
-      },
     });
 
     if (!window) {
@@ -64,7 +60,15 @@ router.delete("/:id", async (req: AuthRequest, res): Promise<void> => {
       return;
     }
 
-    if (window.blockedSite.userId !== req.userId!) {
+    // Find the associated blocked site to check ownership
+    const site = await db.query.blockedSites.findFirst({
+      where: and(
+        eq(blockedSites.id, window.blockedSiteId),
+        eq(blockedSites.userId, req.userId!)
+      ),
+    });
+
+    if (!site) {
       res.status(403).json({ error: "Unauthorized" });
       return;
     }
