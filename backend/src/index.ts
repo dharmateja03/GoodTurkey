@@ -1,12 +1,12 @@
 import "dotenv/config";
 import express from "express";
 import cors from "cors";
-import authRoutes from "./routes/auth";
-import sitesRoutes from "./routes/sites";
-import categoriesRoutes from "./routes/categories";
-import timeWindowsRoutes from "./routes/timeWindows";
-import syncRoutes from "./routes/sync";
-import quotesRoutes from "./routes/quotes";
+import authRoutes from "./routes/auth.js";
+import sitesRoutes from "./routes/sites.js";
+import categoriesRoutes from "./routes/categories.js";
+import timeWindowsRoutes from "./routes/timeWindows.js";
+import syncRoutes from "./routes/sync.js";
+import quotesRoutes from "./routes/quotes.js";
 
 const app = express();
 const PORT = process.env.PORT || 3000;

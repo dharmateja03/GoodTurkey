@@ -1,9 +1,9 @@
 import { Router } from "express";
-import { db } from "../db/index";
-import { blockedSites, timeWindows } from "../db/schema";
+import { db } from "../db/index.js";
+import { blockedSites, timeWindows } from "../db/schema.js";
 import { eq, and, like, sql } from "drizzle-orm";
-import { AuthRequest, authMiddleware } from "../middleware/auth";
-import type { BlockedSite, TimeWindow } from "../db/schema";
+import { AuthRequest, authMiddleware } from "../middleware/auth.js";
+import type { BlockedSite, TimeWindow } from "../db/schema.js";
 
 const router = Router();
 

@@ -1,9 +1,9 @@
 import { Router, Response } from "express";
-import { db } from "../db/index";
-import { users } from "../db/schema";
+import { db } from "../db/index.js";
+import { users } from "../db/schema.js";
 import { eq } from "drizzle-orm";
 import bcrypt from "bcrypt";
-import { generateToken } from "../middleware/auth";
+import { generateToken } from "../middleware/auth.js";
 
 const router = Router();
 

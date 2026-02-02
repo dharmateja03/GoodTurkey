@@ -1,6 +1,6 @@
 import "dotenv/config";
-import { db } from "./index";
-import { users, categories, blockedSites, timeWindows } from "./schema";
+import { db } from "./index.js";
+import { users, categories, blockedSites, timeWindows } from "./schema.js";
 import bcrypt from "bcrypt";
 
 async function seed() {

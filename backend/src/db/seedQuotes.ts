@@ -1,6 +1,6 @@
 import "dotenv/config";
-import { db } from "./index";
-import { quotes } from "./schema";
+import { db } from "./index.js";
+import { quotes } from "./schema.js";
 
 const systemQuotes = [
   // David Goggins
