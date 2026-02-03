@@ -115,8 +115,19 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
       });
       return true;
 
+    case 'getSite':
+      chrome.storage.sync.get(['sites'], (items) => {
+        const site = (items.sites || []).find(s => s.id === request.id);
+        sendResponse({ site });
+      });
+      return true;
+
     case 'addSite':
       addSite(request.site).then(sendResponse);
+      return true;
+
+    case 'updateSite':
+      updateSite(request.id, request.updates).then(sendResponse);
       return true;
 
     case 'removeSite':
@@ -133,6 +144,14 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 
     case 'toggleSite':
       toggleSite(request.id).then(sendResponse);
+      return true;
+
+    case 'addTimeWindow':
+      addTimeWindow(request.siteId, request.timeWindow).then(sendResponse);
+      return true;
+
+    case 'removeTimeWindow':
+      removeTimeWindow(request.siteId, request.windowId).then(sendResponse);
       return true;
 
     case 'getStats':
@@ -333,6 +352,81 @@ async function removeSite(id) {
   });
 }
 
+// Update a site
+async function updateSite(id, updates) {
+  return new Promise((resolve) => {
+    chrome.storage.sync.get(['sites'], (items) => {
+      const sites = items.sites || [];
+      const site = sites.find(s => s.id === id);
+
+      if (!site) {
+        resolve({ success: false, error: 'Site not found' });
+        return;
+      }
+
+      Object.assign(site, updates);
+
+      chrome.storage.sync.set({ sites }, () => {
+        blockedSites = sites;
+        resolve({ success: true, site });
+      });
+    });
+  });
+}
+
+// Add time window to a site
+async function addTimeWindow(siteId, timeWindow) {
+  return new Promise((resolve) => {
+    chrome.storage.sync.get(['sites'], (items) => {
+      const sites = items.sites || [];
+      const site = sites.find(s => s.id === siteId);
+
+      if (!site) {
+        resolve({ success: false, error: 'Site not found' });
+        return;
+      }
+
+      if (!site.timeWindows) {
+        site.timeWindows = [];
+      }
+
+      const newWindow = {
+        id: Date.now().toString(),
+        ...timeWindow
+      };
+
+      site.timeWindows.push(newWindow);
+
+      chrome.storage.sync.set({ sites }, () => {
+        blockedSites = sites;
+        resolve({ success: true, timeWindow: newWindow });
+      });
+    });
+  });
+}
+
+// Remove time window from a site
+async function removeTimeWindow(siteId, windowId) {
+  return new Promise((resolve) => {
+    chrome.storage.sync.get(['sites'], (items) => {
+      const sites = items.sites || [];
+      const site = sites.find(s => s.id === siteId);
+
+      if (!site) {
+        resolve({ success: false, error: 'Site not found' });
+        return;
+      }
+
+      site.timeWindows = (site.timeWindows || []).filter(w => w.id !== windowId);
+
+      chrome.storage.sync.set({ sites }, () => {
+        blockedSites = sites;
+        resolve({ success: true });
+      });
+    });
+  });
+}
+
 // Add a custom quote
 async function addQuote(quote) {
   return new Promise((resolve) => {
@@ -378,8 +472,9 @@ function isUrlBlocked(url) {
       if (!site.isActive) continue;
 
       if (hostname.includes(site.url) || hostname === site.url || hostname === 'www.' + site.url) {
-        // Check time windows
-        if (!isInAllowedTimeWindow(site.timeWindows)) {
+        // Check time windows - if no windows, blocked 24/7
+        // If windows exist, only blocked during those times
+        if (shouldBlockNow(site.timeWindows)) {
           return true;
         }
       }
@@ -390,26 +485,35 @@ function isUrlBlocked(url) {
   return false;
 }
 
-// Check if current time is in allowed window
-function isInAllowedTimeWindow(timeWindows) {
+// Check if site should be blocked right now based on time windows
+function shouldBlockNow(timeWindows) {
+  // No windows = blocked 24/7
   if (!timeWindows || timeWindows.length === 0) {
-    return false; // No windows = blocked all time
+    return true;
   }
 
   const now = new Date();
-  const dayOfWeek = now.getDay();
-  const currentTime = now.toTimeString().slice(0, 5);
+  const dayOfWeek = now.getDay(); // 0 = Sunday, 6 = Saturday
+  const currentTime = now.toTimeString().slice(0, 5); // HH:MM
 
   for (const window of timeWindows) {
-    if (window.dayOfWeek !== null && window.dayOfWeek !== dayOfWeek) {
-      continue;
+    // Check if this window applies to today
+    // days is an array like [1,2,3,4,5] for weekdays, or null/empty for every day
+    const days = window.days;
+
+    if (days && days.length > 0) {
+      if (!days.includes(dayOfWeek)) {
+        continue; // This window doesn't apply today
+      }
     }
 
+    // Check if current time is within the block window
     if (currentTime >= window.startTime && currentTime <= window.endTime) {
-      return true;
+      return true; // Should block now
     }
   }
 
+  // Not in any block window
   return false;
 }
 
