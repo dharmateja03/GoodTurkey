@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Stay Focused | GoodTurkey</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Inter', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 40px 20px;
+      position: relative;
+      overflow: hidden;
+      background: #000;
+    }
+
+    .bg-gradient {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background:
+        radial-gradient(ellipse at 20% 20%, rgba(34, 197, 94, 0.15) 0%, transparent 50%),
+        radial-gradient(ellipse at 80% 80%, rgba(22, 163, 74, 0.1) 0%, transparent 50%),
+        radial-gradient(ellipse at 50% 50%, rgba(16, 185, 129, 0.05) 0%, transparent 70%),
+        linear-gradient(180deg, #0a0a0a 0%, #0f1f0f 50%, #0a0a0a 100%);
+      animation: bgPulse 8s ease-in-out infinite;
+    }
+
+    @keyframes bgPulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.8; }
+    }
+
+    .particles {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      overflow: hidden;
+      pointer-events: none;
+    }
+
+    .particle {
+      position: absolute;
+      width: 4px;
+      height: 4px;
+      background: rgba(34, 197, 94, 0.4);
+      border-radius: 50%;
+      animation: float 15s infinite;
+    }
+
+    .particle:nth-child(1) { left: 10%; animation-delay: 0s; animation-duration: 20s; }
+    .particle:nth-child(2) { left: 20%; animation-delay: 2s; animation-duration: 18s; }
+    .particle:nth-child(3) { left: 30%; animation-delay: 4s; animation-duration: 22s; }
+    .particle:nth-child(4) { left: 40%; animation-delay: 1s; animation-duration: 19s; }
+    .particle:nth-child(5) { left: 50%; animation-delay: 3s; animation-duration: 21s; }
+    .particle:nth-child(6) { left: 60%; animation-delay: 5s; animation-duration: 17s; }
+    .particle:nth-child(7) { left: 70%; animation-delay: 2s; animation-duration: 23s; }
+    .particle:nth-child(8) { left: 80%; animation-delay: 4s; animation-duration: 16s; }
+    .particle:nth-child(9) { left: 90%; animation-delay: 1s; animation-duration: 20s; }
+
+    @keyframes float {
+      0% {
+        transform: translateY(100vh) scale(0);
+        opacity: 0;
+      }
+      10% { opacity: 1; }
+      90% { opacity: 1; }
+      100% {
+        transform: translateY(-100vh) scale(1);
+        opacity: 0;
+      }
+    }
+
+    .container {
+      max-width: 640px;
+      width: 100%;
+      text-align: center;
+      position: relative;
+      z-index: 10;
+      padding: 60px 48px;
+      background: rgba(255, 255, 255, 0.02);
+      backdrop-filter: blur(40px);
+      -webkit-backdrop-filter: blur(40px);
+      border-radius: 32px;
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      box-shadow:
+        0 0 0 1px rgba(255, 255, 255, 0.02),
+        0 40px 80px rgba(0, 0, 0, 0.5),
+        inset 0 1px 0 rgba(255, 255, 255, 0.05);
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      margin-bottom: 48px;
+    }
+
+    .logo-icon {
+      width: 56px;
+      height: 56px;
+      background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 8px 32px rgba(34, 197, 94, 0.3);
+      animation: iconGlow 3s ease-in-out infinite;
+    }
+
+    .logo-icon svg {
+      width: 28px;
+      height: 28px;
+      fill: white;
+    }
+
+    @keyframes iconGlow {
+      0%, 100% { box-shadow: 0 8px 32px rgba(34, 197, 94, 0.3); }
+      50% { box-shadow: 0 8px 48px rgba(34, 197, 94, 0.5); }
+    }
+
+    .logo-text {
+      font-size: 28px;
+      font-weight: 700;
+      color: #fff;
+      letter-spacing: -0.5px;
+    }
+
+    .quote {
+      font-size: 32px;
+      line-height: 1.4;
+      font-weight: 500;
+      margin-bottom: 32px;
+      color: #ffffff;
+      letter-spacing: -0.5px;
+    }
+
+    .author {
+      font-size: 14px;
+      color: rgba(255, 255, 255, 0.5);
+      text-transform: uppercase;
+      letter-spacing: 3px;
+      font-weight: 500;
+    }
+
+    .blocked-info {
+      margin-top: 48px;
+      padding-top: 32px;
+      border-top: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    .blocked-label {
+      font-size: 11px;
+      color: rgba(255, 255, 255, 0.3);
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      margin-bottom: 8px;
+    }
+
+    .blocked-url {
+      font-size: 16px;
+      color: rgba(255, 255, 255, 0.6);
+      font-family: 'SF Mono', Monaco, monospace;
+      background: rgba(255, 255, 255, 0.03);
+      padding: 12px 20px;
+      border-radius: 12px;
+      display: inline-block;
+    }
+
+    .suggestion {
+      margin-top: 32px;
+      font-size: 14px;
+      color: rgba(255, 255, 255, 0.4);
+    }
+
+    .suggestion strong {
+      color: #22c55e;
+      font-weight: 600;
+    }
+
+    .stats {
+      display: flex;
+      justify-content: center;
+      gap: 32px;
+      margin-top: 24px;
+    }
+
+    .stat {
+      text-align: center;
+    }
+
+    .stat-value {
+      font-size: 24px;
+      font-weight: 700;
+      color: #22c55e;
+    }
+
+    .stat-label {
+      font-size: 11px;
+      color: rgba(255, 255, 255, 0.4);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-top: 4px;
+    }
+
+    @media (max-width: 640px) {
+      .container { padding: 40px 24px; border-radius: 24px; }
+      .quote { font-size: 24px; }
+      .logo-icon { width: 48px; height: 48px; }
+      .logo-text { font-size: 24px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="bg-gradient"></div>
+
+  <div class="particles">
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+  </div>
+
+  <div class="container">
+    <div class="logo">
+      <div class="logo-icon">
+        <svg viewBox="0 0 24 24">
+          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+        </svg>
+      </div>
+      <span class="logo-text">GoodTurkey</span>
+    </div>
+
+    <div class="quote" id="quote">"Stay focused. Keep grinding."</div>
+    <div class="author" id="author">You</div>
+
+    <div class="blocked-info">
+      <div class="blocked-label">Site Blocked</div>
+      <div class="blocked-url" id="blockedUrl">-</div>
+    </div>
+
+    <div class="stats">
+      <div class="stat">
+        <div class="stat-value" id="blockedToday">0</div>
+        <div class="stat-label">Blocked Today</div>
+      </div>
+      <div class="stat">
+        <div class="stat-value" id="streak">0</div>
+        <div class="stat-label">Day Streak</div>
+      </div>
+    </div>
+
+    <div class="suggestion">
+      Take a deep breath. <strong>You've got this.</strong>
+    </div>
+  </div>
+
+  <script>
+    const defaultQuotes = [
+      { text: "Don't stop when you're tired. Stop when you're done.", author: "David Goggins" },
+      { text: "You are stopping you. You are giving up instead of getting hard.", author: "David Goggins" },
+      { text: "Suffering is the true test of life.", author: "David Goggins" },
+      { text: "Nobody cares what you did yesterday. What have you done today?", author: "David Goggins" },
+      { text: "The path to success is through discomfort.", author: "Naval Ravikant" },
+      { text: "When something is important enough, you do it even if the odds are not in your favor.", author: "Elon Musk" },
+      { text: "Your attention is your most valuable asset. Protect it.", author: "Dan Koe" },
+      { text: "Stop consuming. Start creating.", author: "Dan Koe" },
+      { text: "Clarity comes from action, not thought.", author: "Dan Koe" },
+      { text: "The goal isn't to be busy. The goal is to be effective.", author: "Dan Koe" },
+    ];
+
+    function showQuote(quotes) {
+      const q = quotes[Math.floor(Math.random() * quotes.length)];
+      document.getElementById('quote').textContent = '"' + q.text + '"';
+      document.getElementById('author').textContent = q.author;
+    }
+
+    // Show blocked URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const blockedUrl = urlParams.get('url');
+    if (blockedUrl) {
+      try {
+        const hostname = new URL(blockedUrl).hostname;
+        document.getElementById('blockedUrl').textContent = hostname;
+      } catch (e) {
+        document.getElementById('blockedUrl').textContent = blockedUrl;
+      }
+    }
+
+    // Load quotes and stats
+    try {
+      chrome.storage.sync.get(['quotes', 'stats'], function(items) {
+        // Quotes
+        if (items.quotes && items.quotes.length > 0) {
+          const activeQuotes = items.quotes.filter(q => q.active !== false);
+          if (activeQuotes.length > 0) {
+            showQuote(activeQuotes);
+          } else {
+            showQuote(defaultQuotes);
+          }
+        } else {
+          showQuote(defaultQuotes);
+        }
+
+        // Stats
+        if (items.stats) {
+          document.getElementById('blockedToday').textContent = items.stats.blockedToday || 0;
+          document.getElementById('streak').textContent = items.stats.streak || 0;
+        }
+      });
+    } catch(e) {
+      showQuote(defaultQuotes);
+    }
+  </script>
+</body>
+</html>

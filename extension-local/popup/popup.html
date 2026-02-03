@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GoodTurkey</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div id="app">
+    <!-- Main Dashboard -->
+    <div id="dashboard" class="screen">
+      <!-- Header -->
+      <div class="header">
+        <div class="header-left">
+          <div class="logo-icon"></div>
+          <span class="brand">GoodTurkey</span>
+        </div>
+        <button id="settingsBtn" class="icon-btn" title="Settings">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="3"/>
+            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+          </svg>
+        </button>
+      </div>
+
+      <!-- Stats Cards -->
+      <div class="stats-container">
+        <div class="stat-card">
+          <div class="stat-value" id="blockedToday">0</div>
+          <div class="stat-label">Blocked Today</div>
+        </div>
+        <div class="stat-card accent">
+          <div class="stat-value" id="streakCount">0</div>
+          <div class="stat-label">Day Streak</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="totalBlocked">0</div>
+          <div class="stat-label">Total Blocked</div>
+        </div>
+      </div>
+
+      <!-- Quick Add -->
+      <div class="quick-add">
+        <form id="addSiteForm">
+          <input type="text" id="newSiteUrl" placeholder="Block a site (e.g., twitter.com)">
+          <button type="submit" class="btn-add" title="Add site">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="12" y1="5" x2="12" y2="19"/>
+              <line x1="5" y1="12" x2="19" y2="12"/>
+            </svg>
+          </button>
+        </form>
+      </div>
+
+      <!-- Blocked Sites List -->
+      <div class="section-header">
+        <span>Blocked Sites</span>
+        <span class="site-count" id="siteCount">0 sites</span>
+      </div>
+      <div class="sites-list" id="sitesList">
+        <div class="empty-state">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+          </svg>
+          <p>No sites blocked yet</p>
+          <span>Add a site above to get started</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Settings Screen -->
+    <div id="settingsScreen" class="screen hidden">
+      <div class="header">
+        <button id="backBtn" class="icon-btn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="19" y1="12" x2="5" y2="12"/>
+            <polyline points="12 19 5 12 12 5"/>
+          </svg>
+        </button>
+        <span class="header-title">Settings</span>
+        <div style="width: 32px;"></div>
+      </div>
+
+      <div class="settings-content">
+        <div class="setting-group">
+          <div class="setting-group-title">Unlock Delay</div>
+          <div class="setting-item">
+            <span>Wait time before removing sites</span>
+            <select id="unlockDelay">
+              <option value="1">1 hour</option>
+              <option value="3">3 hours</option>
+              <option value="6" selected>6 hours</option>
+              <option value="12">12 hours</option>
+              <option value="24">24 hours</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="setting-group">
+          <div class="setting-group-title">Preferences</div>
+          <div class="setting-item">
+            <span>Show notifications</span>
+            <label class="toggle">
+              <input type="checkbox" id="notificationsToggle" checked>
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+        </div>
+
+        <div class="setting-group">
+          <div class="setting-group-title">Data</div>
+          <div class="setting-item clickable" id="manageQuotesBtn">
+            <span>Manage Quotes</span>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="9 18 15 12 9 6"/>
+            </svg>
+          </div>
+          <div class="setting-item clickable danger" id="clearStatsBtn">
+            <span>Reset Statistics</span>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="3 6 5 6 21 6"/>
+              <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+            </svg>
+          </div>
+        </div>
+
+        <div class="version">GoodTurkey v1.0.0</div>
+      </div>
+    </div>
+
+    <!-- Quotes Screen -->
+    <div id="quotesScreen" class="screen hidden">
+      <div class="header">
+        <button id="quotesBackBtn" class="icon-btn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="19" y1="12" x2="5" y2="12"/>
+            <polyline points="12 19 5 12 12 5"/>
+          </svg>
+        </button>
+        <span class="header-title">Quotes</span>
+        <div style="width: 32px;"></div>
+      </div>
+
+      <div class="quotes-content">
+        <form id="addQuoteForm" class="add-quote-form">
+          <input type="text" id="quoteText" placeholder="Quote text..." required>
+          <input type="text" id="quoteAuthor" placeholder="Author" required>
+          <button type="submit" class="btn-small">Add</button>
+        </form>
+
+        <div class="quotes-list" id="quotesList"></div>
+      </div>
+    </div>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>
