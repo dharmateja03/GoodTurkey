@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>🔒</title>
+  <title>Stay Focused | GoodTurkey</title>
   <style>
     * {
       margin: 0;
@@ -13,95 +13,258 @@
 
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Inter', sans-serif;
-      background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 50%, #16213e 100%);
       min-height: 100vh;
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: 40px;
+      padding: 40px 20px;
       position: relative;
       overflow: hidden;
+      background: #000;
     }
 
-    .orb {
+    /* Animated gradient background */
+    .bg-gradient {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background:
+        radial-gradient(ellipse at 20% 20%, rgba(34, 197, 94, 0.15) 0%, transparent 50%),
+        radial-gradient(ellipse at 80% 80%, rgba(22, 163, 74, 0.1) 0%, transparent 50%),
+        radial-gradient(ellipse at 50% 50%, rgba(16, 185, 129, 0.05) 0%, transparent 70%),
+        linear-gradient(180deg, #0a0a0a 0%, #0f1f0f 50%, #0a0a0a 100%);
+      animation: bgPulse 8s ease-in-out infinite;
+    }
+
+    @keyframes bgPulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.8; }
+    }
+
+    /* Floating particles */
+    .particles {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      overflow: hidden;
+      pointer-events: none;
+    }
+
+    .particle {
       position: absolute;
+      width: 4px;
+      height: 4px;
+      background: rgba(34, 197, 94, 0.3);
       border-radius: 50%;
-      filter: blur(100px);
-      opacity: 0.5;
-      animation: float 20s ease-in-out infinite;
+      animation: float 15s infinite;
     }
 
-    .orb-1 {
-      width: 400px;
-      height: 400px;
-      background: radial-gradient(circle, rgba(99,102,241,0.4) 0%, transparent 70%);
-      top: -100px;
-      left: -100px;
-    }
-
-    .orb-2 {
-      width: 300px;
-      height: 300px;
-      background: radial-gradient(circle, rgba(168,85,247,0.4) 0%, transparent 70%);
-      bottom: -50px;
-      right: -50px;
-      animation-delay: -7s;
-    }
+    .particle:nth-child(1) { left: 10%; animation-delay: 0s; animation-duration: 20s; }
+    .particle:nth-child(2) { left: 20%; animation-delay: 2s; animation-duration: 18s; }
+    .particle:nth-child(3) { left: 30%; animation-delay: 4s; animation-duration: 22s; }
+    .particle:nth-child(4) { left: 40%; animation-delay: 1s; animation-duration: 19s; }
+    .particle:nth-child(5) { left: 50%; animation-delay: 3s; animation-duration: 21s; }
+    .particle:nth-child(6) { left: 60%; animation-delay: 5s; animation-duration: 17s; }
+    .particle:nth-child(7) { left: 70%; animation-delay: 2s; animation-duration: 23s; }
+    .particle:nth-child(8) { left: 80%; animation-delay: 4s; animation-duration: 16s; }
+    .particle:nth-child(9) { left: 90%; animation-delay: 1s; animation-duration: 20s; }
 
     @keyframes float {
-      0%, 100% { transform: translate(0, 0) scale(1); }
-      33% { transform: translate(30px, -30px) scale(1.1); }
-      66% { transform: translate(-20px, 20px) scale(0.9); }
+      0% {
+        transform: translateY(100vh) scale(0);
+        opacity: 0;
+      }
+      10% {
+        opacity: 1;
+      }
+      90% {
+        opacity: 1;
+      }
+      100% {
+        transform: translateY(-100vh) scale(1);
+        opacity: 0;
+      }
     }
 
+    /* Main container */
     .container {
-      max-width: 800px;
+      max-width: 640px;
+      width: 100%;
       text-align: center;
       position: relative;
       z-index: 10;
-      padding: 60px;
-      background: rgba(255, 255, 255, 0.03);
-      backdrop-filter: blur(20px);
-      border-radius: 24px;
-      border: 1px solid rgba(255, 255, 255, 0.1);
+      padding: 60px 48px;
+      background: rgba(255, 255, 255, 0.02);
+      backdrop-filter: blur(40px);
+      -webkit-backdrop-filter: blur(40px);
+      border-radius: 32px;
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      box-shadow:
+        0 0 0 1px rgba(255, 255, 255, 0.02),
+        0 40px 80px rgba(0, 0, 0, 0.5),
+        inset 0 1px 0 rgba(255, 255, 255, 0.05);
     }
 
-    .icon {
-      font-size: 56px;
-      margin-bottom: 40px;
-      animation: glow 3s ease-in-out infinite;
+    /* Logo */
+    .logo {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      margin-bottom: 48px;
     }
 
-    @keyframes glow {
-      0%, 100% { opacity: 0.6; filter: drop-shadow(0 0 20px rgba(255, 100, 50, 0.5)); }
-      50% { opacity: 1; filter: drop-shadow(0 0 40px rgba(255, 100, 50, 0.8)); }
+    .logo-icon {
+      width: 56px;
+      height: 56px;
+      background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 8px 32px rgba(34, 197, 94, 0.3);
+      animation: iconGlow 3s ease-in-out infinite;
     }
 
+    .logo-icon svg {
+      width: 28px;
+      height: 28px;
+      fill: white;
+    }
+
+    @keyframes iconGlow {
+      0%, 100% {
+        box-shadow: 0 8px 32px rgba(34, 197, 94, 0.3);
+      }
+      50% {
+        box-shadow: 0 8px 48px rgba(34, 197, 94, 0.5);
+      }
+    }
+
+    .logo-text {
+      font-size: 28px;
+      font-weight: 700;
+      color: #fff;
+      letter-spacing: -0.5px;
+    }
+
+    /* Quote */
     .quote {
-      font-size: 36px;
-      line-height: 1.5;
-      font-weight: 400;
-      margin-bottom: 40px;
+      font-size: 32px;
+      line-height: 1.4;
+      font-weight: 500;
+      margin-bottom: 32px;
       color: #ffffff;
-      text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+      letter-spacing: -0.5px;
     }
 
     .author {
       font-size: 14px;
-      color: rgba(255, 255, 255, 0.6);
+      color: rgba(255, 255, 255, 0.5);
       text-transform: uppercase;
       letter-spacing: 3px;
+      font-weight: 500;
+    }
+
+    /* Blocked site info */
+    .blocked-info {
+      margin-top: 48px;
+      padding-top: 32px;
+      border-top: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    .blocked-label {
+      font-size: 11px;
+      color: rgba(255, 255, 255, 0.3);
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      margin-bottom: 8px;
+    }
+
+    .blocked-url {
+      font-size: 16px;
+      color: rgba(255, 255, 255, 0.6);
+      font-family: 'SF Mono', Monaco, monospace;
+      background: rgba(255, 255, 255, 0.03);
+      padding: 12px 20px;
+      border-radius: 12px;
+      display: inline-block;
+    }
+
+    /* Timer suggestion */
+    .suggestion {
+      margin-top: 32px;
+      font-size: 14px;
+      color: rgba(255, 255, 255, 0.4);
+    }
+
+    .suggestion strong {
+      color: #22c55e;
+      font-weight: 600;
+    }
+
+    /* Responsive */
+    @media (max-width: 640px) {
+      .container {
+        padding: 40px 24px;
+        border-radius: 24px;
+      }
+
+      .quote {
+        font-size: 24px;
+      }
+
+      .logo-icon {
+        width: 48px;
+        height: 48px;
+      }
+
+      .logo-text {
+        font-size: 24px;
+      }
     }
   </style>
 </head>
 <body>
-  <div class="orb orb-1"></div>
-  <div class="orb orb-2"></div>
-  
+  <div class="bg-gradient"></div>
+
+  <div class="particles">
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+  </div>
+
   <div class="container">
-    <div class="icon">🔥</div>
-    <div class="quote" id="quote">Stay focused. Keep grinding.</div>
-    <div class="author" id="author">— You</div>
+    <div class="logo">
+      <div class="logo-icon">
+        <svg viewBox="0 0 24 24">
+          <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+        </svg>
+      </div>
+      <span class="logo-text">GoodTurkey</span>
+    </div>
+
+    <div class="quote" id="quote">"Stay focused. Keep grinding."</div>
+    <div class="author" id="author">You</div>
+
+    <div class="blocked-info">
+      <div class="blocked-label">Site Blocked</div>
+      <div class="blocked-url" id="blockedUrl">-</div>
+    </div>
+
+    <div class="suggestion">
+      Take a deep breath. <strong>You've got this.</strong>
+    </div>
   </div>
 
   <script>
@@ -109,14 +272,31 @@
       { text: "You are stopping you. You are giving up instead of getting hard.", author: "David Goggins" },
       { text: "Don't stop when you're tired. Stop when you're done.", author: "David Goggins" },
       { text: "The only way you gain mental toughness is to do things you're not happy doing.", author: "David Goggins" },
+      { text: "Suffering is the true test of life.", author: "David Goggins" },
+      { text: "Nobody cares what you did yesterday. What have you done today?", author: "David Goggins" },
       { text: "The path to success is through discomfort.", author: "Naval Ravikant" },
       { text: "When something is important enough, you do it even if the odds are not in your favor.", author: "Elon Musk" },
+      { text: "Your attention is your most valuable asset. Protect it.", author: "Dan Koe" },
+      { text: "Stop consuming. Start creating.", author: "Dan Koe" },
+      { text: "Clarity comes from action, not thought.", author: "Dan Koe" },
     ];
 
     function showQuote(quotes) {
       const q = quotes[Math.floor(Math.random() * quotes.length)];
       document.getElementById('quote').textContent = '"' + q.text + '"';
-      document.getElementById('author').textContent = '— ' + q.author;
+      document.getElementById('author').textContent = q.author;
+    }
+
+    // Show blocked URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const blockedUrl = urlParams.get('url');
+    if (blockedUrl) {
+      try {
+        const hostname = new URL(blockedUrl).hostname;
+        document.getElementById('blockedUrl').textContent = hostname;
+      } catch (e) {
+        document.getElementById('blockedUrl').textContent = blockedUrl;
+      }
     }
 
     // Try loading user quotes

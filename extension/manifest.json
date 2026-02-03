@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "GoodTurkey",
   "version": "1.0.0",
-  "description": "Website blocker with 6-hour unlock delay",
+  "description": "Block distracting websites and stay focused. Features time-based blocking, motivational quotes, and a 6-hour unlock delay to build better habits.",
   "permissions": [
     "storage",
     "alarms",

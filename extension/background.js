@@ -1,51 +1,98 @@
-// Change this to your deployed backend URL
-const API_BASE = 'https://your-backend.railway.app/api'; // TODO: Update after deployment
+// API Configuration
+const API_BASE = 'https://goodturkey-backend-production.up.railway.app/api';
 const SYNC_INTERVAL_MINUTES = 15;
 
 // State
 let rules = [];
-let blockedUrls = new Map(); // Map of URL patterns to rules
+let blockedUrls = new Map();
 let token = null;
 let userId = null;
 
 // Initialize extension
 chrome.runtime.onInstalled.addListener(() => {
-  console.log('HotTurkey extension installed');
-  // Set up periodic sync
+  console.log('GoodTurkey extension installed');
   chrome.alarms.create('syncRules', { periodInMinutes: SYNC_INTERVAL_MINUTES });
-  // Sync immediately
+  chrome.alarms.create('resetDailyStats', { periodInMinutes: 60 });
+  initializeStats();
   syncRules();
 });
 
-// Handle alarm for periodic sync
+// Handle alarms
 chrome.alarms.onAlarm.addListener((alarm) => {
   if (alarm.name === 'syncRules') {
     syncRules();
+  } else if (alarm.name === 'resetDailyStats') {
+    checkAndResetDailyStats();
   }
 });
 
+// Initialize stats if not present
+function initializeStats() {
+  chrome.storage.sync.get(['stats', 'lastStatsDate'], (items) => {
+    if (!items.stats) {
+      chrome.storage.sync.set({
+        stats: { blockedToday: 0, streak: 0, totalBlocked: 0 },
+        lastStatsDate: new Date().toDateString()
+      });
+    }
+  });
+}
+
+// Check and reset daily stats at midnight
+function checkAndResetDailyStats() {
+  const today = new Date().toDateString();
+  chrome.storage.sync.get(['lastStatsDate', 'stats'], (items) => {
+    if (items.lastStatsDate !== today) {
+      const stats = items.stats || { blockedToday: 0, streak: 0, totalBlocked: 0 };
+
+      // If user had blocks yesterday, increment streak; otherwise reset
+      if (stats.blockedToday > 0) {
+        stats.streak = (stats.streak || 0) + 1;
+      }
+
+      stats.blockedToday = 0;
+      chrome.storage.sync.set({ stats, lastStatsDate: today });
+    }
+  });
+}
+
 // Listen for messages from popup
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-  if (request.action === 'setToken') {
-    token = request.token;
-    userId = request.userId;
-    chrome.storage.sync.set({ authToken: request.token, userId: request.userId });
-    syncRules();
-    sendResponse({ success: true });
-  } else if (request.action === 'getToken') {
-    sendResponse({ token, userId });
-  } else if (request.action === 'logout') {
-    token = null;
-    userId = null;
-    rules = [];
-    chrome.storage.sync.remove(['authToken', 'userId']);
-    sendResponse({ success: true });
-  } else if (request.action === 'getRules') {
-    sendResponse({ rules });
-  } else if (request.action === 'syncRules') {
-    syncRules().then(() => {
-      sendResponse({ success: true, rules });
-    });
+  switch (request.action) {
+    case 'setToken':
+      token = request.token;
+      userId = request.userId;
+      chrome.storage.sync.set({ authToken: request.token, userId: request.userId });
+      syncRules();
+      sendResponse({ success: true });
+      break;
+
+    case 'getToken':
+      sendResponse({ token, userId });
+      break;
+
+    case 'logout':
+      token = null;
+      userId = null;
+      rules = [];
+      blockedUrls.clear();
+      chrome.storage.sync.remove(['authToken', 'userId', 'cachedRules', 'cachedQuotes']);
+      sendResponse({ success: true });
+      break;
+
+    case 'getRules':
+      sendResponse({ rules });
+      break;
+
+    case 'syncRules':
+      syncRules().then(() => sendResponse({ success: true, rules }));
+      return true; // Keep channel open for async
+
+    case 'getStats':
+      chrome.storage.sync.get(['stats'], (items) => {
+        sendResponse({ stats: items.stats });
+      });
+      return true;
   }
 });
 
@@ -71,15 +118,12 @@ async function syncRules() {
 
   try {
     const response = await fetch(`${API_BASE}/sync`, {
-      headers: {
-        'Authorization': `Bearer ${token}`,
-      },
+      headers: { 'Authorization': `Bearer ${token}` },
     });
 
     if (!response.ok) {
       console.error('Sync failed:', response.status);
       if (response.status === 401) {
-        // Token expired
         token = null;
         chrome.storage.sync.remove(['authToken', 'userId']);
       }
@@ -89,16 +133,15 @@ async function syncRules() {
     const data = await response.json();
     rules = data.rules || [];
 
-    // Build URL pattern map
     blockedUrls.clear();
-    rules.forEach((rule) => {
-      blockedUrls.set(rule.url, rule);
-    });
+    rules.forEach((rule) => blockedUrls.set(rule.url, rule));
 
     console.log('Rules synced:', rules.length, 'sites');
-    chrome.storage.sync.set({ cachedRules: JSON.stringify(rules), lastSync: new Date().toISOString() });
-    
-    // Also sync quotes
+    chrome.storage.sync.set({
+      cachedRules: JSON.stringify(rules),
+      lastSync: new Date().toISOString()
+    });
+
     await syncQuotes();
   } catch (error) {
     console.error('Sync error:', error);
@@ -108,22 +151,16 @@ async function syncRules() {
 // Sync quotes from backend
 async function syncQuotes() {
   if (!token) return;
-  
+
   try {
     const response = await fetch(`${API_BASE}/quotes`, {
-      headers: {
-        'Authorization': `Bearer ${token}`,
-      },
+      headers: { 'Authorization': `Bearer ${token}` },
     });
-    
-    if (!response.ok) {
-      console.error('Quotes sync failed:', response.status);
-      return;
-    }
-    
+
+    if (!response.ok) return;
+
     const quotes = await response.json();
     const activeQuotes = quotes.filter((q) => q.isActive);
-    
     chrome.storage.sync.set({ cachedQuotes: JSON.stringify(activeQuotes) });
     console.log('Quotes synced:', activeQuotes.length, 'active quotes');
   } catch (error) {
@@ -136,10 +173,8 @@ function isUrlBlocked(url) {
   try {
     const hostname = new URL(url).hostname;
 
-    // Check if this domain matches any blocked rule
     for (const [pattern, rule] of blockedUrls) {
       if (hostname.includes(pattern)) {
-        // Check time windows
         if (!isInAllowedTimeWindow(rule.timeWindows)) {
           return true;
         }
@@ -148,41 +183,46 @@ function isUrlBlocked(url) {
   } catch (error) {
     console.error('Error checking URL:', error);
   }
-
   return false;
 }
 
 // Check if current time falls in any allowed time window
 function isInAllowedTimeWindow(timeWindows) {
   if (!timeWindows || timeWindows.length === 0) {
-    // No time windows = blocked all the time
-    return false;
+    return false; // No windows = blocked all time
   }
 
   const now = new Date();
   const dayOfWeek = now.getDay();
-  const currentTime = now.toTimeString().slice(0, 5); // HH:MM
+  const currentTime = now.toTimeString().slice(0, 5);
 
-    for (const window of timeWindows) {
-    // Check if window applies to today (null means every day)
+  for (const window of timeWindows) {
     if (window.dayOfWeek !== null && window.dayOfWeek !== dayOfWeek) {
       continue;
     }
 
-    // Check if current time is within window
-    // Convert HH:MM:SS to HH:MM for comparison
     const startTime = window.startTime.slice(0, 5);
     const endTime = window.endTime.slice(0, 5);
+
     if (currentTime >= startTime && currentTime <= endTime) {
-      return true; // In allowed window
+      return true;
     }
   }
 
-  return false; // Not in any allowed window
+  return false;
 }
 
-// Record access attempt to backend
+// Record access attempt and update stats
 async function recordAccessAttempt(url) {
+  // Update local stats
+  chrome.storage.sync.get(['stats'], (items) => {
+    const stats = items.stats || { blockedToday: 0, streak: 0, totalBlocked: 0 };
+    stats.blockedToday++;
+    stats.totalBlocked++;
+    chrome.storage.sync.set({ stats });
+  });
+
+  // Record to backend
   if (!token) return;
 
   try {
@@ -202,11 +242,13 @@ async function recordAccessAttempt(url) {
 // Block navigation to blocked sites
 chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
   if (changeInfo.status === 'loading' && tab.url) {
-    if (isUrlBlocked(tab.url)) {
-      // Record the attempt
-      recordAccessAttempt(tab.url);
+    // Skip chrome:// and extension URLs
+    if (tab.url.startsWith('chrome://') || tab.url.startsWith('chrome-extension://')) {
+      return;
+    }
 
-      // Redirect to blocked page
+    if (isUrlBlocked(tab.url)) {
+      recordAccessAttempt(tab.url);
       const blockedUrl = chrome.runtime.getURL('blocked.html') + '?url=' + encodeURIComponent(tab.url);
       chrome.tabs.update(tabId, { url: blockedUrl });
     }
@@ -215,19 +257,17 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
 
 // Initialize on startup
 loadStoredToken().then(() => {
+  checkAndResetDailyStats();
+
   if (token) {
-    // Try to sync if we have a token
     syncRules();
   } else {
-    // Try to load cached rules
     chrome.storage.sync.get(['cachedRules'], (items) => {
       if (items.cachedRules) {
         try {
           rules = JSON.parse(items.cachedRules);
           blockedUrls.clear();
-          rules.forEach((rule) => {
-            blockedUrls.set(rule.url, rule);
-          });
+          rules.forEach((rule) => blockedUrls.set(rule.url, rule));
           console.log('Loaded cached rules:', rules.length, 'sites');
         } catch (error) {
           console.error('Error loading cached rules:', error);
